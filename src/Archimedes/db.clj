@@ -1,8 +1,10 @@
 (ns Archimedes.db
-  (:refer-clojure :exclude [==])
-  (:require [clojure.core.logic :refer :all]))
+  (:refer-clojure :exclude [== indexed?])
+  (:require [clojure.core.logic :refer :all :as l]
+            [clojure.core.logic.pldb :as pldb]))
 
-(defrel types-
+(pldb/db-rel
+  types-
   ^:indexed
   type-name
   ^:indexed
@@ -18,7 +20,7 @@
   ^:indexed
   return-or-no-return)
 
-(defrel operations-
+(pldb/db-rel operations-
   ^:index op-name
   ^:index arity
   ^:index return)
@@ -128,19 +130,21 @@
    ;; :gte {:arity 2}
    })
 
-(doseq [[type-name data] type-db]
-  (fact types- type-name
-        (:representation data)
-        (:natural-or-other data)
-        (:width data)
-        (:point data)
-        (:boxed-or-unboxed data)
-        (:return-or-no-return data)))
+(def types-ldb
+  (apply pldb/db
+         (for [[type-name data] type-db]
+           [types-
+            type-name
+            (:representation data)
+            (:natural-or-other data)
+            (:width data)
+            (:point data)
+            (:boxed-or-unboxed data)
+            (:return-or-no-return data)])))
 
-(doseq [[op-name data] operations]
-  (fact operations-
-        op-name
-        (:arity data)
-        (:return data)))
+(def operations-ldb
+  (apply pldb/db
+         (for [[op-name data] operations]
+           [operations- op-name (:arity data) (:return data)])))
 
 (def natural-division-result :Ratio)

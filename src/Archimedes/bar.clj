@@ -1,7 +1,9 @@
 (ns Archimedes.bar
   (:refer-clojure :exclude [== gensym])
   (:require [clojure.core.logic :refer :all]
-            [Archimedes.db :refer [types- type-db operations operations- natural-division-result]]
+            [clojure.core.logic.pldb :as pldb]
+            [Archimedes.db :refer [types- type-db operations operations- natural-division-result
+                                   types-ldb operations-ldb]]
             [Archimedes.codegen :refer [h]]
             [clojure.java.io :as io]
             [Archimedes.predicates :refer :all]))
@@ -104,21 +106,21 @@
 ;; driver
 
 (defn f []
-  (run* [q]
-    (fresh [op arg1 arg2 return]
-      (setupo q op arg1 arg2 return)
-      (binaryo op)
-      (constrain-returno return)
-      (sameo op arg1 arg2 return)
-      (floating-point-contaminato arg1 arg2 return)
-      (ratio-contaminato arg1 arg2 return)
-      (object-contaminato arg1 arg2 return)
-      (number-contaminato arg1 arg2 return)
-      (bigdecimal-contaminato arg1 arg2 return)
-      (special-diviso op arg1 arg2 return)
-      (fixed-width-cantaminato op arg1 arg2 return)
-      (natural-contaminato op arg1 arg2 return)
-      )))
+  (pldb/with-dbs [operations-ldb types-ldb]
+   (run* [q]
+     (fresh [op arg1 arg2 return]
+       (setupo q op arg1 arg2 return)
+       (binaryo op)
+       (constrain-returno return)
+       (sameo op arg1 arg2 return)
+       (floating-point-contaminato arg1 arg2 return)
+       (ratio-contaminato arg1 arg2 return)
+       (object-contaminato arg1 arg2 return)
+       (number-contaminato arg1 arg2 return)
+       (bigdecimal-contaminato arg1 arg2 return)
+       (special-diviso op arg1 arg2 return)
+       (fixed-width-cantaminato op arg1 arg2 return)
+       (natural-contaminato op arg1 arg2 return)))))
 
 (defn code-gen [output class-name]
   (.mkdirs (.getParentFile (io/file output)))

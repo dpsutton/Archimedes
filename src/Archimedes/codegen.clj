@@ -1,7 +1,9 @@
 (ns Archimedes.codegen
   (:refer-clojure :exclude [== gensym])
   (:require [clojure.core.logic :refer :all]
-            [Archimedes.db :refer [types- type-db operations operations- natural-division-result]]
+            [clojure.core.logic.pldb :as pldb]
+            [Archimedes.db :refer [types- type-db operations operations- natural-division-result
+                                   types-ldb operations-ldb]]
             [clojure.java.io :as io]
             [Archimedes.predicates :refer :all]))
 
@@ -400,7 +402,7 @@
       (fresh [aa bb]
         (casto arg1 a1 in-code aa)
         (casto arg2 b1 aa bb)
-        (conso (str (ctor :Ratio a1 b1) ";") 
+        (conso (str (ctor :Ratio a1 b1) ";")
                bb
                out-code)))]
    [(== op :divide)
@@ -578,8 +580,9 @@
                                     an2 (gensym 'b)]
                                 [an1 an2
                                  (doall
-                                  (run 1 [q]
-                                    (g op (->V arg1 an1) (->V arg2 an2) return () q)))]))
+                                   (pldb/with-dbs [types-ldb operations-ldb]
+                                    (run 1 [q]
+                                      (g op (->V arg1 an1) (->V arg2 an2) return () q))))]))
               x (reverse x)]]
     (cond
      (seq x)
